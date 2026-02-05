@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HowTube - Learn How To Do Anything</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <link rel="stylesheet" href="how.css">
+</head>
+
+<body class="bg-gray-100 text-gray-900 transition-colors duration-500">
+
+  <!-- Header -->
+  <header id="mainHeader" class="bg-red-600 text-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50 transition-shadow duration-200">
+    <div class="flex items-center gap-4">
+      <button id="menuBtn" class="lg:hidden p-2 hover:bg-red-700 rounded-lg transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+      <img src="how.jpg" alt="HowTube Logo" class="h-10 w-10 rounded-full">
+      <h1 class="text-2xl font-bold">
+        <a href="how.html" class="text-white hover:opacity-90 transition-opacity">HowTube</a>
+      </h1>
+    </div>
+
+    <div class="flex items-center gap-2 flex-1 max-w-2xl mx-4">
+      <div class="flex-1 flex relative">
+        <input id="searchBox" type="text" 
+               placeholder="Search How To..." 
+               autocomplete="off"
+               class="p-2 px-4 rounded-l-full text-black w-full border border-gray-300 focus:border-blue-500 transition-all duration-200">
+        
+        <!-- Search Suggestions Dropdown -->
+        <div id="searchSuggestions" class="hidden absolute top-full left-0 right-12 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50">
+        </div>
+        
+        <button id="searchBtn" 
+                class="bg-gray-100 text-gray-700 font-semibold px-6 rounded-r-full border border-l-0 border-gray-300 hover:bg-gray-200 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <button id="voiceSearchBtn" 
+              class="p-2 hover:bg-red-700 rounded-full transition-all" title="Voice Search">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button id="darkModeBtn" 
+              class="p-2 hover:bg-red-700 rounded-full transition-all" title="Dark Mode">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+      </button>
+
+      <button id="notificationsBtn" 
+              class="p-2 hover:bg-red-700 rounded-full transition-all relative" title="Notifications">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+        </svg>
+        <span id="notificationBadge" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+      </button>
+
+      <!-- Notifications Dropdown -->
+      <div id="notificationsDropdown" class="hidden absolute top-full right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+          <h3 class="font-bold text-lg">Notifications</h3>
+          <button id="markAllRead" class="text-sm text-blue-600 hover:text-blue-700">Mark all as read</button>
+        </div>
+        <div id="notificationsList"></div>
+      </div>
+
+      <button id="settingsBtn" 
+              class="p-2 hover:bg-red-700 rounded-full transition-all" title="Settings">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+      </button>
+
+      <!-- Settings Dropdown -->
+      <div id="settingsDropdown" class="hidden absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+        <div class="p-4 border-b border-gray-200">
+          <h3 class="font-bold text-lg">Settings</h3>
+        </div>
+        <div class="p-4 space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Theme</label>
+            <select id="themeSelect" class="w-full p-2 border rounded-lg">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="auto">Auto</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Language</label>
+            <select id="languageSelect" class="w-full p-2 border rounded-lg">
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="ja">日本語</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Autoplay</label>
+            <label class="flex items-center">
+              <input type="checkbox" id="autoplayToggle" class="mr-2" checked>
+              <span class="text-sm">Autoplay next video</span>
+            </label>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">View Density</label>
+            <select id="densitySelect" class="w-full p-2 border rounded-lg">
+              <option value="comfortable">Comfortable</option>
+              <option value="compact">Compact</option>
+              <option value="cozy">Cozy</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button id="profileBtn" 
+              class="w-8 h-8 bg-red-700 hover:bg-red-800 rounded-full flex items-center justify-center font-bold transition-all" title="Profile">
+        U
+      </button>
+    </div>
+  </header>
+
+  <div class="flex flex-col lg:flex-row min-h-screen">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" 
+           class="bg-white lg:w-64 p-4 shadow-md flex-shrink-0 transition-transform duration-200 lg:sticky lg:top-0 lg:self-start">
+      
+      <!-- Home Section -->
+      <div class="mb-2">
+        <button id="homeBtn" class="sidebar-item active w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <span class="font-medium">Home</span>
+        </button>
+        
+        <button id="trendingBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+          </svg>
+          <span class="font-medium">Trending</span>
+        </button>
+
+        <button id="subscriptionsBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+          <span class="font-medium">Subscriptions</span>
+        </button>
+      </div>
+
+      <hr class="my-3 border-gray-200">
+
+      <!-- Library Section -->
+      <div class="mb-2">
+        <button id="libraryBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+          <span class="font-medium">Library</span>
+        </button>
+
+        <button id="historyBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="font-medium">History</span>
+        </button>
+
+        <button id="watchLaterBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="font-medium">Watch Later</span>
+        </button>
+
+        <button id="likedBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
+          </svg>
+          <span class="font-medium">Liked Videos</span>
+        </button>
+
+        <button id="playlistsBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          <span class="font-medium">Playlists</span>
+        </button>
+        
+        <button id="analyticsBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          <span class="font-medium">Analytics</span>
+        </button>
+      </div>
+
+      <hr class="my-3 border-gray-200">
+
+      <!-- Explore Section -->
+      <div class="mb-2">
+        <h3 class="text-xs font-semibold text-gray-500 uppercase px-3 mb-2">Explore</h3>
+        
+        <button id="popularBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path>
+          </svg>
+          <span class="font-medium">Popular</span>
+        </button>
+
+        <button id="musicBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+          </svg>
+          <span class="font-medium">Music</span>
+        </button>
+
+        <button id="gamingBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path>
+          </svg>
+          <span class="font-medium">Gaming</span>
+        </button>
+
+        <button id="newsBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+          </svg>
+          <span class="font-medium">News</span>
+        </button>
+
+        <button id="sportsBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="font-medium">Sports</span>
+        </button>
+
+        <button id="liveBtn" class="sidebar-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+          <span class="font-medium">Live</span>
+          <span class="ml-auto bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">LIVE</span>
+        </button>
+      </div>
+
+      <hr class="my-3 border-gray-200">
+
+      <h2 class="font-bold text-sm mb-3 text-gray-800 px-3">Categories</h2>
+
+      <ul id="category-list" class="flex flex-col gap-2">
+
+        <!-- Original Categories -->
+        <li data-category="how to cook" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>🍳</span> Cooking
+        </li>
+
+        <li data-category="how to fix" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>🔧</span> DIY & Fix
+        </li>
+
+        <li data-category="how to code" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>💻</span> Coding
+        </li>
+
+        <li data-category="how to learn" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>📚</span> Learning
+        </li>
+
+        <li data-category="how to draw" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>🎨</span> Art & Drawing
+        </li>
+
+
+        <!-- New Categories -->
+        <li data-category="how to garden" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>🌱</span> Gardening
+        </li>
+
+        <li data-category="how to travel" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>✈️</span> Travel
+        </li>
+
+        <li data-category="how to workout" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>💪</span> Fitness & Workout
+        </li>
+
+        <li data-category="how to music" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>🎵</span> Music
+        </li>
+
+        <li data-category="how to photography" 
+            class="category-item cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white transition-all flex items-center gap-2">
+          <span>📷</span> Photography
+        </li>
+
+      </ul>
+
+      <hr class="my-3 border-gray-200">
+
+      <!-- Footer Links -->
+      <div class="px-3 py-2">
+        <div class="flex flex-wrap gap-2 text-xs text-gray-600 mb-3">
+          <a href="#" class="hover:text-gray-900">About</a>
+          <a href="#" class="hover:text-gray-900">Press</a>
+          <a href="#" class="hover:text-gray-900">Copyright</a>
+          <a href="#" class="hover:text-gray-900">Contact</a>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs text-gray-600 mb-3">
+          <a href="#" class="hover:text-gray-900">Creators</a>
+          <a href="#" class="hover:text-gray-900">Advertise</a>
+          <a href="#" class="hover:text-gray-900">Developers</a>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs text-gray-600 mb-3">
+          <a href="#" class="hover:text-gray-900">Terms</a>
+          <a href="#" class="hover:text-gray-900">Privacy</a>
+          <a href="#" class="hover:text-gray-900">Policy</a>
+        </div>
+        <p class="text-xs text-gray-500 mt-4">© 2025 HowTube</p>
+      </div>
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-6 min-h-screen">
+      
+      <!-- Filters and Options Bar -->
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-sm">
+        
+        <!-- Left side - Filters -->
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Sort Dropdown -->
+          <div class="relative">
+            <button id="sortBtn" class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
+              </svg>
+              <span id="sortLabel">Sort: Relevance</span>
+            </button>
+            <div id="sortDropdown" class="hidden absolute top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[200px] z-10">
+              <button data-sort="relevance" class="sort-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">Relevance</button>
+              <button data-sort="date" class="sort-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">Upload Date</button>
+              <button data-sort="viewCount" class="sort-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">View Count</button>
+              <button data-sort="rating" class="sort-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">Rating</button>
+            </div>
+          </div>
+
+          <!-- Duration Filter -->
+          <div class="relative">
+            <button id="durationBtn" class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span id="durationLabel">Duration: Any</span>
+            </button>
+            <div id="durationDropdown" class="hidden absolute top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[200px] z-10">
+              <button data-duration="any" class="duration-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">Any Duration</button>
+              <button data-duration="short" class="duration-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">Under 4 minutes</button>
+              <button data-duration="medium" class="duration-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">4-20 minutes</button>
+              <button data-duration="long" class="duration-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">Over 20 minutes</button>
+            </div>
+          </div>
+
+          <!-- Upload Date Filter -->
+          <div class="relative">
+            <button id="uploadDateBtn" class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span id="uploadDateLabel">Upload: Any Time</span>
+            </button>
+            <div id="uploadDateDropdown" class="hidden absolute top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[200px] z-10">
+              <button data-upload="any" class="upload-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">Any Time</button>
+              <button data-upload="hour" class="upload-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">Last Hour</button>
+              <button data-upload="today" class="upload-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">Today</button>
+              <button data-upload="week" class="upload-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">This Week</button>
+              <button data-upload="month" class="upload-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">This Month</button>
+              <button data-upload="year" class="upload-option w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">This Year</button>
+            </div>
+          </div>
+
+          <!-- Clear Filters -->
+          <button id="clearFiltersBtn" class="hidden px-4 py-2 text-red-600 hover:bg-red-50 rounded-full text-sm font-medium transition-all">
+            Clear Filters
+          </button>
+        </div>
+
+        <!-- Right side - View Mode -->
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600 mr-2">View:</span>
+          <button id="gridViewBtn" class="view-btn active p-2 hover:bg-gray-100 rounded-lg transition-all" title="Grid View">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+            </svg>
+          </button>
+          <button id="listViewBtn" class="view-btn p-2 hover:bg-gray-100 rounded-lg transition-all" title="List View">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chips Filter Bar -->
+      <div class="mb-6 overflow-x-auto">
+        <div id="chipsBar" class="flex gap-3 pb-2">
+          <button class="chip active" data-chip="all">All</button>
+          <button class="chip" data-chip="new">New to you</button>
+          <button class="chip" data-chip="watched">Watched</button>
+          <button class="chip" data-chip="unwatched">Unwatched</button>
+          <button class="chip" data-chip="live">Live</button>
+          <button class="chip" data-chip="posts">Posts</button>
+          <button class="chip" data-chip="recently">Recently uploaded</button>
+          <button class="chip" data-chip="popular">Popular</button>
+        </div>
+      </div>
+
+      <!-- Results Info -->
+      <div id="resultsInfo" class="mb-4 text-sm text-gray-600"></div>
+
+      <!-- Video Container -->
+      <div id="video-container" 
+           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      </div>
+
+      <div id="loadingSpinner" class="hidden text-center mt-8">
+        <div class="spinner"></div>
+        <p class="text-gray-500 mt-2">Loading more videos...</p>
+      </div>
+      </div>
+    </main>
+
+    <!-- Recommendations Sidebar (shown when video is playing) -->
+    <aside id="recommendationsSidebar" class="hidden w-96 bg-white p-4 overflow-y-auto border-l border-gray-200">
+      <h3 class="font-bold text-lg mb-4">Up Next</h3>
+      <div id="recommendationsList" class="space-y-3"></div>
+    </aside>
+
+  </div>
+
+  <footer class="bg-red-600 text-white text-center py-4 mt-8">
+    © 2025 HowTube. All rights reserved.
+  </footer>
+
+  <!-- Mini Player -->
+  <div id="miniPlayer" class="hidden fixed bottom-4 right-4 w-80 bg-black rounded-lg shadow-2xl z-50 overflow-hidden">
+    <div class="relative">
+      <div id="miniPlayerContent" class="aspect-video bg-black"></div>
+      <div class="absolute top-2 right-2 flex gap-2">
+        <button id="expandMiniPlayer" class="p-1 bg-black/50 hover:bg-black/70 rounded" title="Expand">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+          </svg>
+        </button>
+        <button id="closeMiniPlayer" class="p-1 bg-black/50 hover:bg-black/70 rounded" title="Close">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="p-2 bg-gray-900 text-white">
+      <p id="miniPlayerTitle" class="text-xs font-semibold truncate"></p>
+    </div>
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <button id="scrollToTop" class="hidden fixed bottom-8 right-8 p-3 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-all z-40">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+    </svg>
+  </button>
+
+  <!-- Comments Modal -->
+  <div id="commentsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+      <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="font-bold text-lg">Comments</h3>
+        <button id="closeCommentsBtn" class="text-gray-600 hover:text-gray-900">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="p-4 border-b border-gray-200">
+        <div class="flex gap-3">
+          <div class="channel-avatar">U</div>
+          <div class="flex-1">
+            <textarea id="commentInput" placeholder="Add a comment..." class="w-full p-2 border rounded-lg resize-none" rows="2"></textarea>
+            <div class="flex justify-end gap-2 mt-2">
+              <button id="cancelCommentBtn" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+              <button id="postCommentBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Comment</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto p-4">
+        <div class="flex items-center gap-4 mb-4">
+          <span class="font-semibold" id="commentCount">1,234 Comments</span>
+          <select id="commentSort" class="text-sm border-none">
+            <option>Top comments</option>
+            <option>Newest first</option>
+          </select>
+        </div>
+        <div id="commentsList" class="space-y-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics Dashboard Modal -->
+  <div id="analyticsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden">
+      <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="font-bold text-xl">Your Analytics</h3>
+        <button id="closeAnalyticsBtn" class="text-gray-600 hover:text-gray-900">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="p-6 overflow-y-auto" style="max-height: calc(80vh - 80px);">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg">
+            <p class="text-sm opacity-90">Total Watch Time</p>
+            <p class="text-3xl font-bold mt-2" id="totalWatchTime">0h</p>
+          </div>
+          <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-lg">
+            <p class="text-sm opacity-90">Videos Watched</p>
+            <p class="text-3xl font-bold mt-2" id="videosWatched">0</p>
+          </div>
+          <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-lg">
+            <p class="text-sm opacity-90">Liked Videos</p>
+            <p class="text-3xl font-bold mt-2" id="likedCount">0</p>
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 p-6 rounded-lg mb-6">
+          <h4 class="font-bold mb-4">Top Categories</h4>
+          <div id="topCategories" class="space-y-2"></div>
+        </div>
+        
+        <div class="bg-gray-50 p-6 rounded-lg">
+          <h4 class="font-bold mb-4">Recent Activity</h4>
+          <div id="recentActivity" class="space-y-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Playlists Modal -->
+  <div id="playlistsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-3xl w-full max-h-[80vh] overflow-hidden">
+      <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="font-bold text-xl">Your Playlists</h3>
+        <div class="flex gap-2">
+          <button id="createPlaylistBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            + New Playlist
+          </button>
+          <button id="closePlaylistsBtn" class="text-gray-600 hover:text-gray-900">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6 overflow-y-auto" style="max-height: calc(80vh - 80px);">
+        <div id="playlistsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3">
+    <span id="toastMessage"></span>
+    <button id="toastAction" class="text-blue-400 hover:text-blue-300 font-semibold"></button>
+  </div>
+
+  <script src="how.js"></script>
+  <script src="how-features.js"></script>
+  <script src="how-advanced.js"></script>
+</body>
+</html>
