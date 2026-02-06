@@ -1471,3 +1471,478 @@ body.dark-mode #darkModeBtn svg {
   letter-spacing: 0.5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+
+/* ========================================
+   MOBILE RESPONSIVE DESIGN
+   ======================================== */
+
+/* Mobile First - Base styles for mobile */
+@media (max-width: 768px) {
+  /* Header adjustments */
+  header {
+    padding: 12px 8px !important;
+    flex-wrap: wrap;
+  }
+
+  header h1 {
+    font-size: 18px !important;
+  }
+
+  /* Search bar mobile */
+  header .flex-1 {
+    order: 3;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  #searchBox {
+    font-size: 14px;
+    padding: 8px 12px !important;
+  }
+
+  /* Hide some header buttons on mobile */
+  #voiceSearchBtn,
+  #darkModeBtn {
+    display: none !important;
+  }
+
+  /* Sidebar mobile */
+  #sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    z-index: 100;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  #sidebar.mobile-open {
+    left: 0;
+  }
+
+  /* Mobile overlay */
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+  }
+
+  .mobile-overlay.active {
+    display: block;
+  }
+
+  /* Main content mobile */
+  main {
+    padding: 12px !important;
+    width: 100%;
+  }
+
+  /* Video grid mobile - 1 column */
+  #video-container {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Continue watching mobile */
+  #continueWatchingContainer {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Video cards mobile */
+  .video-card {
+    border-radius: 12px !important;
+  }
+
+  .video-card h3 {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+
+  .video-card p {
+    font-size: 12px !important;
+  }
+
+  /* Chips bar mobile - horizontal scroll */
+  #chipsBar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  #chipsBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip {
+    white-space: nowrap;
+    font-size: 13px !important;
+    padding: 6px 14px !important;
+  }
+
+  /* Filters mobile */
+  .mb-6.flex {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .flex.flex-wrap.items-center.gap-3 {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Dropdowns mobile */
+  #sortDropdown,
+  #durationDropdown,
+  #uploadDateDropdown,
+  #notificationsDropdown,
+  #settingsDropdown {
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90% !important;
+    max-width: 320px !important;
+    max-height: 70vh !important;
+  }
+
+  /* Player modal mobile */
+  #playerModal {
+    padding: 0 !important;
+  }
+
+  #playerModal > div {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+
+  #playerWrap {
+    height: 250px !important;
+  }
+
+  /* Comments modal mobile */
+  #commentsModal {
+    padding: 0 !important;
+  }
+
+  #commentsModal > div {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+  }
+
+  /* Mini player mobile */
+  #miniPlayer {
+    bottom: 60px !important;
+    right: 8px !important;
+    width: 200px !important;
+  }
+
+  /* Scroll to top button mobile */
+  #scrollToTop {
+    bottom: 80px !important;
+    right: 16px !important;
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  /* Profile button mobile */
+  #profileBtn {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 12px !important;
+  }
+
+  /* Notifications badge mobile */
+  #notificationBadge {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  /* Footer mobile */
+  footer {
+    padding: 16px 8px !important;
+    font-size: 12px !important;
+  }
+
+  /* Continue watching mobile */
+  .continue-watching-card h3 {
+    font-size: 13px !important;
+  }
+
+  .continue-watching-time {
+    font-size: 10px !important;
+    padding: 2px 4px !important;
+  }
+
+  /* Section headers mobile */
+  h2 {
+    font-size: 18px !important;
+  }
+
+  h2 svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* Results info mobile */
+  #resultsInfo {
+    font-size: 12px !important;
+  }
+
+  /* Loading spinner mobile */
+  .spinner {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+
+/* Tablet - 2 columns */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #video-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  #continueWatchingContainer {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  #sidebar {
+    width: 200px;
+  }
+
+  main {
+    padding: 16px !important;
+  }
+}
+
+/* Small mobile - extra compact */
+@media (max-width: 480px) {
+  header {
+    padding: 8px 4px !important;
+  }
+
+  header h1 {
+    font-size: 16px !important;
+  }
+
+  header img {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  #searchBox {
+    font-size: 13px;
+    padding: 6px 10px !important;
+  }
+
+  main {
+    padding: 8px !important;
+  }
+
+  .video-card {
+    border-radius: 8px !important;
+  }
+
+  .chip {
+    font-size: 12px !important;
+    padding: 5px 12px !important;
+  }
+
+  #playerWrap {
+    height: 200px !important;
+  }
+
+  #miniPlayer {
+    width: 160px !important;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  #playerWrap {
+    height: 100vh !important;
+  }
+
+  #playerModal > div {
+    height: 100vh !important;
+  }
+}
+
+/* Touch-friendly buttons */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  .sidebar-item,
+  .category-item,
+  .chip,
+  .video-card {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .video-menu-btn {
+    padding: 12px !important;
+  }
+}
+
+/* Mobile menu button */
+#menuBtn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #menuBtn {
+    display: flex !important;
+  }
+}
+
+/* Hide sidebar on mobile by default */
+@media (max-width: 768px) {
+  .lg\:flex-row {
+    flex-direction: column !important;
+  }
+}
+
+/* Mobile-specific animations */
+@media (max-width: 768px) {
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideOutLeft {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  #sidebar.mobile-open {
+    animation: slideInLeft 0.3s ease;
+  }
+
+  #sidebar.mobile-closing {
+    animation: slideOutLeft 0.3s ease;
+  }
+}
+
+/* Improve touch scrolling */
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #sidebar,
+  #chipsBar,
+  main {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Mobile safe areas (for notch devices) */
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    header {
+      padding-left: max(8px, env(safe-area-inset-left));
+      padding-right: max(8px, env(safe-area-inset-right));
+      padding-top: max(12px, env(safe-area-inset-top));
+    }
+
+    main {
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    #sidebar {
+      padding-left: max(16px, env(safe-area-inset-left));
+    }
+  }
+}
+
+/* Dark mode mobile adjustments */
+@media (max-width: 768px) {
+  body.dark-mode #sidebar {
+    background-color: #212121 !important;
+    border-right: 1px solid #3a3a3a;
+  }
+
+  body.dark-mode .mobile-overlay {
+    background: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Mobile video card list view */
+@media (max-width: 768px) {
+  .video-card-list {
+    flex-direction: column !important;
+  }
+
+  .video-card-list .relative {
+    width: 100% !important;
+  }
+}
+
+/* Mobile profile page */
+@media (max-width: 768px) {
+  .profile-header {
+    padding: 16px !important;
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+
+  .profile-avatar {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .stat-card {
+    padding: 16px !important;
+  }
+
+  .stat-value {
+    font-size: 20px !important;
+  }
+
+  .tab-btn {
+    font-size: 13px !important;
+    padding: 12px 8px !important;
+  }
+}
+
+/* Mobile signup page */
+@media (max-width: 768px) {
+  .login-card {
+    padding: 24px 16px !important;
+    margin: 16px !important;
+  }
+
+  .login-card h1 {
+    font-size: 24px !important;
+  }
+
+  .social-btn {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+}
