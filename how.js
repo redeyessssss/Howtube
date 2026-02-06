@@ -219,10 +219,7 @@ function setupHeaderButtons() {
     // Settings - now opens dropdown
     // Handled in how-advanced.js
 
-    // Profile
-    document.getElementById('profileBtn').addEventListener('click', () => {
-        alert('👤 User Profile\n\nFeatures:\n• Your channel\n• Switch account\n• Sign out\n• YouTube Studio');
-    });
+    // Profile button - handled by onclick in HTML (navigates to profile.html)
 }
 
 // Setup filter listeners
