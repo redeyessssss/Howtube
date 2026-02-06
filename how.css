@@ -1378,3 +1378,96 @@ main {
 body.dark-mode #darkModeBtn svg {
   transform: rotate(180deg);
 }
+
+
+/* Continue Watching Section */
+#continueWatchingSection {
+  animation: fadeIn 0.5s ease;
+}
+
+#continueWatchingSection h2 {
+  color: var(--text-primary);
+}
+
+.continue-watching-card {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.continue-watching-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px var(--shadow);
+}
+
+.continue-watching-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.continue-watching-progress-bar {
+  height: 100%;
+  background: #ef4444;
+  transition: width 0.3s ease;
+}
+
+.continue-watching-time {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.continue-watching-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.continue-watching-card:hover .continue-watching-remove {
+  opacity: 1;
+}
+
+.continue-watching-remove:hover {
+  background: #ef4444;
+}
+
+/* Recommended Section */
+#recommendedSection h2 {
+  color: var(--text-primary);
+}
+
+.recommended-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}

@@ -3,6 +3,9 @@
 // Move API key to environment variable or config file in production
 const API_KEY = "AIzaSyARLESrFSVKUPSm52QR3jjBr-7_BWfLsJM";
 
+// Initialize Recommendation Engine
+let recommendationEngine;
+
 let nextPageToken = "";
 let currentQuery = "how to";
 let isLoading = false;
@@ -24,6 +27,8 @@ let currentPlayingVideo = null;
 let miniPlayerActive = false;
 let theaterMode = false;
 let playbackSpeed = 1;
+let videoWatchStartTime = 0;
+let videoWatchInterval = null;
 
 // Wait for YouTube API to be ready
 window.onYouTubeIframeAPIReady = function() {
@@ -42,7 +47,15 @@ createPlayerModal();
 
 // Kick off initial search and setup category listeners
 window.onload = () => {
-    searchVideos(true);
+    // Initialize recommendation engine
+    recommendationEngine = new RecommendationEngine();
+    
+    // Load continue watching
+    loadContinueWatching();
+    
+    // Load personalized recommendations or default
+    loadPersonalizedContent();
+    
     setupCategoryListeners();
     setupFilterListeners();
     setupViewModeListeners();
@@ -614,7 +627,7 @@ function renderVideos(videos) {
         // Click to play in modal
         card.addEventListener('click', () => {
             if (videoId) {
-                openPlayerModal(videoId);
+                openPlayerModal(video);
                 addToWatchHistory(videoId, video.snippet?.title, thumbUrl, video.snippet?.channelTitle);
                 saveToSearchHistory(currentQuery);
             }
@@ -1038,13 +1051,15 @@ function setupPlayerControls() {
     });
 }
 
-function openPlayerModal(videoId) {
+function openPlayerModal(video, startTime = 0) {
+    const videoId = video.id.videoId || video.id;
+    
     if (!videoId || typeof videoId !== 'string') {
         console.error("Invalid video ID provided to openPlayerModal");
         return;
     }
 
-    currentPlayingVideo = videoId;
+    currentPlayingVideo = video;
 
     const modal = document.getElementById("playerModal");
     const wrap = document.getElementById("playerWrap");
@@ -1086,10 +1101,11 @@ function openPlayerModal(videoId) {
                 'autoplay': 1,
                 'rel': 0,
                 'modestbranding': 1,
-                'origin': window.location.origin
+                'origin': window.location.origin,
+                'start': Math.floor(startTime)
             },
             events: {
-                'onReady': onPlayerReady,
+                'onReady': (event) => onPlayerReady(event, video),
                 'onError': (event) => onPlayerError(event, videoId, wrap),
                 'onStateChange': onPlayerStateChange
             }
@@ -1100,10 +1116,12 @@ function openPlayerModal(videoId) {
     }
 }
 
-function onPlayerReady(event) {
+function onPlayerReady(event, video) {
     console.log("Player ready, attempting to play");
     try {
         event.target.playVideo();
+        // Start watch tracking
+        startWatchTracking(video);
     } catch (e) {
         console.error("Error playing video:", e);
     }
@@ -1159,6 +1177,9 @@ function closePlayerModal() {
     const modal = document.getElementById("playerModal");
     const wrap = document.getElementById("playerWrap");
     
+    // Stop watch tracking
+    stopWatchTracking();
+    
     // Destroy the player to stop playback
     if (ytPlayer) {
         try {
@@ -1183,4 +1204,189 @@ function goHome() {
     searchBox.value = "how to";
     searchVideos(true);
     return false;
+}
+
+
+// ------------------------------
+// PERSONALIZED RECOMMENDATIONS
+// ------------------------------
+
+// Load personalized content
+function loadPersonalizedContent() {
+    const query = recommendationEngine.getRecommendationQuery();
+    currentQuery = query;
+    searchVideos(true);
+    
+    // Show recommended section if user has history
+    const stats = recommendationEngine.getUserStats();
+    if (stats.totalWatched > 0) {
+        document.getElementById('recommendedSection').classList.remove('hidden');
+    }
+}
+
+// Load continue watching section
+function loadContinueWatching() {
+    const continueWatching = recommendationEngine.getContinueWatching();
+    const section = document.getElementById('continueWatchingSection');
+    const container = document.getElementById('continueWatchingContainer');
+    
+    if (continueWatching.length === 0) {
+        section.classList.add('hidden');
+        return;
+    }
+    
+    section.classList.remove('hidden');
+    container.innerHTML = '';
+    
+    continueWatching.forEach(item => {
+        const card = createContinueWatchingCard(item);
+        container.appendChild(card);
+    });
+    
+    // Setup clear all button
+    document.getElementById('clearContinueWatching').addEventListener('click', () => {
+        if (confirm('Clear all continue watching videos?')) {
+            recommendationEngine.continueWatching = [];
+            localStorage.setItem('continueWatching', '[]');
+            section.classList.add('hidden');
+        }
+    });
+}
+
+// Create continue watching card
+function createContinueWatchingCard(item) {
+    const card = document.createElement('div');
+    card.className = 'video-card continue-watching-card bg-white rounded-lg overflow-hidden shadow-md relative';
+    
+    const progressPercent = Math.round(item.watchPercentage);
+    const remainingTime = formatDuration(item.duration - item.watchTime);
+    
+    card.innerHTML = `
+        <div class="relative">
+            <img src="${item.thumbnail}" alt="${item.title}" class="w-full aspect-video object-cover">
+            <div class="continue-watching-progress">
+                <div class="continue-watching-progress-bar" style="width: ${progressPercent}%"></div>
+            </div>
+            <div class="continue-watching-time">${remainingTime} left</div>
+            <button class="continue-watching-remove" data-video-id="${item.videoId}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="p-4">
+            <h3 class="font-semibold text-sm mb-2 line-clamp-2">${item.title}</h3>
+            <p class="text-xs text-gray-600">${item.channelTitle}</p>
+            <p class="text-xs text-gray-500 mt-1">${progressPercent}% watched</p>
+        </div>
+    `;
+    
+    // Click to play
+    card.addEventListener('click', (e) => {
+        if (!e.target.closest('.continue-watching-remove')) {
+            // Reconstruct video object
+            const video = {
+                id: { videoId: item.videoId },
+                snippet: {
+                    title: item.title,
+                    thumbnails: { medium: { url: item.thumbnail } },
+                    channelTitle: item.channelTitle,
+                    description: ''
+                }
+            };
+            openPlayerModal(video, item.watchTime);
+        }
+    });
+    
+    // Remove button
+    const removeBtn = card.querySelector('.continue-watching-remove');
+    removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        recommendationEngine.removeFromContinueWatching(item.videoId);
+        card.remove();
+        
+        // Hide section if empty
+        if (recommendationEngine.getContinueWatching().length === 0) {
+            document.getElementById('continueWatchingSection').classList.add('hidden');
+        }
+    });
+    
+    return card;
+}
+
+// Format duration helper
+function formatDuration(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Track video watch time
+function startWatchTracking(video) {
+    videoWatchStartTime = Date.now();
+    currentPlayingVideo = video;
+    
+    // Clear any existing interval
+    if (videoWatchInterval) {
+        clearInterval(videoWatchInterval);
+    }
+    
+    // Update watch time every 5 seconds
+    videoWatchInterval = setInterval(() => {
+        if (ytPlayer && ytPlayer.getPlayerState() === 1) { // Playing
+            const currentTime = ytPlayer.getCurrentTime();
+            const duration = ytPlayer.getDuration();
+            
+            if (currentTime && duration) {
+                recommendationEngine.trackVideoWatch(video, currentTime, duration);
+            }
+        }
+    }, 5000);
+}
+
+// Stop watch tracking
+function stopWatchTracking() {
+    if (videoWatchInterval) {
+        clearInterval(videoWatchInterval);
+        videoWatchInterval = null;
+    }
+    
+    // Final update
+    if (ytPlayer && currentPlayingVideo) {
+        const currentTime = ytPlayer.getCurrentTime();
+        const duration = ytPlayer.getDuration();
+        
+        if (currentTime && duration) {
+            recommendationEngine.trackVideoWatch(currentPlayingVideo, currentTime, duration);
+        }
+    }
+    
+    // Reload continue watching
+    loadContinueWatching();
+}
+
+// Override search to track queries
+const originalSearchVideos = searchVideos;
+function searchVideos(reset = false) {
+    if (reset && currentQuery && currentQuery !== 'how to') {
+        recommendationEngine.trackSearch(currentQuery);
+    }
+    return originalSearchVideos(reset);
+}
+
+// Sort videos by recommendation score
+function applySortByRecommendation(videos) {
+    const stats = recommendationEngine.getUserStats();
+    
+    // Only apply personalized sorting if user has history
+    if (stats.totalWatched > 5) {
+        return recommendationEngine.sortByRecommendation(videos);
+    }
+    
+    return videos;
 }
