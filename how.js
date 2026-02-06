@@ -801,15 +801,93 @@ function searchBySection(section) {
 }
 
 // ------------------------------
-// DARK MODE
+// DARK MODE - Modern Implementation
 // ------------------------------
-document.getElementById("darkModeBtn").addEventListener("click", ()=>{
+const darkModeBtn = document.getElementById("darkModeBtn");
+const darkModeIcon = darkModeBtn.querySelector("svg");
+
+// Check for saved theme preference or default to light mode
+const currentTheme = localStorage.getItem('theme') || 'light';
+
+// Apply saved theme on page load
+if (currentTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    updateDarkModeIcon(true);
+}
+
+// Toggle dark mode
+darkModeBtn.addEventListener("click", () => {
     document.body.classList.toggle("dark-mode");
-    // simple color invert using tailwind-friendly classes - user can adjust CSS
-    document.body.classList.toggle("bg-gray-900");
-    document.body.classList.toggle("text-white");
+    const isDark = document.body.classList.contains("dark-mode");
+    
+    // Save preference
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    
+    // Update icon
+    updateDarkModeIcon(isDark);
+    
+    // Show toast notification
+    showToast(isDark ? '🌙 Dark mode enabled' : '☀️ Light mode enabled');
 });
 
+// Update dark mode icon
+function updateDarkModeIcon(isDark) {
+    if (isDark) {
+        // Sun icon for light mode (when in dark mode)
+        darkModeIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        `;
+        darkModeBtn.setAttribute('title', 'Switch to Light Mode');
+    } else {
+        // Moon icon for dark mode (when in light mode)
+        darkModeIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        `;
+        darkModeBtn.setAttribute('title', 'Switch to Dark Mode');
+    }
+}
+
+// Toast notification function
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-20 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in';
+    toast.style.animation = 'slideInRight 0.3s ease';
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+// Add animation keyframes
+const themeStyle = document.createElement('style');
+themeStyle.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(themeStyle);
 // ------------------------------
 // SEARCH ON ENTER & BUTTON
 // ------------------------------

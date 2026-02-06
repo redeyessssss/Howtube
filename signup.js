@@ -11,6 +11,12 @@ import {
   set
 } from './firebase-config.js';
 
+// Apply saved theme on page load
+const savedTheme = localStorage.getItem('theme') || 'light';
+if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+}
+
 // DOM Elements
 const signupForm = document.getElementById('signupForm');
 const signupName = document.getElementById('signupName');

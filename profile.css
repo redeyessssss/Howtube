@@ -453,3 +453,109 @@ textarea:focus {
     background-position: -200% 0;
   }
 }
+
+
+/* Dark mode for profile and signup pages */
+body.dark-mode {
+  background: linear-gradient(to bottom right, #0f0f0f, #1a1a1a) !important;
+}
+
+body.dark-mode .login-card,
+body.dark-mode .bg-white {
+  background-color: #1f1f1f !important;
+  border: 1px solid #3a3a3a;
+}
+
+body.dark-mode .profile-header {
+  background: linear-gradient(to right, #b91c1c, #be185d) !important;
+}
+
+body.dark-mode .stat-card {
+  background-color: #1f1f1f !important;
+  border: 1px solid #3a3a3a;
+}
+
+body.dark-mode .activity-item {
+  background-color: #272727 !important;
+}
+
+body.dark-mode .tab-btn {
+  color: #aaaaaa !important;
+  border-bottom-color: transparent;
+}
+
+body.dark-mode .tab-btn.active {
+  color: #ef4444 !important;
+  background-color: #272727 !important;
+  border-bottom-color: #ef4444;
+}
+
+body.dark-mode .tab-btn:hover {
+  background-color: #272727 !important;
+}
+
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background-color: #121212 !important;
+  border-color: #3a3a3a !important;
+  color: #f1f3f4 !important;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #717171 !important;
+}
+
+body.dark-mode label {
+  color: #aaaaaa !important;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4 {
+  color: #f1f3f4 !important;
+}
+
+body.dark-mode p {
+  color: #aaaaaa !important;
+}
+
+body.dark-mode .text-gray-600,
+body.dark-mode .text-gray-700 {
+  color: #aaaaaa !important;
+}
+
+body.dark-mode .text-gray-500 {
+  color: #717171 !important;
+}
+
+body.dark-mode .border-gray-200,
+body.dark-mode .border-gray-300 {
+  border-color: #3a3a3a !important;
+}
+
+body.dark-mode .badge {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px);
+}
+
+body.dark-mode .social-btn {
+  background-color: #272727 !important;
+  border-color: #3a3a3a !important;
+}
+
+body.dark-mode .social-btn:hover {
+  background-color: #2a2a2a !important;
+}
+
+body.dark-mode .message-success {
+  background: #064e3b !important;
+  color: #d1fae5 !important;
+}
+
+body.dark-mode .message-error {
+  background: #7f1d1d !important;
+  color: #fee2e2 !important;
+}

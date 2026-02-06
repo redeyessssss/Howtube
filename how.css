@@ -16,20 +16,236 @@
   transform: translateY(-2px);
 }
 
-/* DARK MODE */
-.dark-mode {
-  background-color: #121212 !important;
-  color: #e0e0e0 !important;
+/* DARK MODE - Modern Implementation */
+:root {
+  /* Light mode colors */
+  --bg-primary: #f3f4f6;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f9fafb;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --border-color: #e5e7eb;
+  --hover-bg: #f3f4f6;
+  --card-bg: #ffffff;
+  --header-bg: #ef4444;
+  --sidebar-bg: #ffffff;
+  --input-bg: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.1);
 }
-.dark-mode header,
-.dark-mode footer,
-.dark-mode aside {
-  background-color: #1f1f1f !important;
-  color: #e0e0e0 !important;
+
+body.dark-mode {
+  /* Dark mode colors */
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1f1f1f;
+  --bg-tertiary: #272727;
+  --text-primary: #f1f3f4;
+  --text-secondary: #aaaaaa;
+  --text-tertiary: #717171;
+  --border-color: #3a3a3a;
+  --hover-bg: #2a2a2a;
+  --card-bg: #1f1f1f;
+  --header-bg: #212121;
+  --sidebar-bg: #212121;
+  --input-bg: #121212;
+  --shadow: rgba(0, 0, 0, 0.5);
 }
-.dark-mode input {
-  background-color: #2b2b2b !important;
-  color: #e0e0e0 !important;
+
+/* Apply theme colors */
+body {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Header */
+header {
+  background-color: var(--header-bg) !important;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+body.dark-mode header {
+  background-color: #212121 !important;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Sidebar */
+aside {
+  background-color: var(--sidebar-bg) !important;
+  color: var(--text-primary) !important;
+  border-right: 1px solid var(--border-color);
+}
+
+/* Cards and containers */
+.bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+.bg-gray-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.bg-gray-50 {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Text colors */
+.text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+.text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+/* Borders */
+.border-gray-200,
+.border-gray-300 {
+  border-color: var(--border-color) !important;
+}
+
+/* Inputs */
+input,
+textarea,
+select {
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+/* Buttons */
+button:not(.btn-primary):not([class*="bg-red"]):not([class*="bg-blue"]):not([class*="bg-green"]) {
+  color: var(--text-primary) !important;
+}
+
+/* Hover states */
+.hover\:bg-gray-100:hover,
+.hover\:bg-gray-50:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Video cards */
+.video-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.video-card:hover {
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* Dropdowns */
+#notificationsDropdown,
+#settingsDropdown,
+#searchSuggestions {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* Footer */
+footer {
+  background-color: var(--header-bg) !important;
+}
+
+body.dark-mode footer {
+  background-color: #212121 !important;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Sidebar items */
+.sidebar-item {
+  color: var(--text-primary) !important;
+}
+
+.sidebar-item:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+.sidebar-item.active {
+  background-color: var(--hover-bg) !important;
+  color: #ef4444 !important;
+}
+
+/* Category items */
+.category-item {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+}
+
+.category-item:hover {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+/* Chips */
+.chip {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color);
+}
+
+.chip.active,
+.chip:hover {
+  background-color: var(--text-primary) !important;
+  color: var(--bg-primary) !important;
+}
+
+/* Comments */
+.comment-item {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Modals */
+.modal-content {
+  background-color: var(--card-bg) !important;
+}
+
+/* Scrollbar for dark mode */
+body.dark-mode ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Search suggestions */
+.suggestion-item {
+  color: var(--text-primary) !important;
+}
+
+.suggestion-item:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Smooth transitions for theme switch */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
 }
 
 /* TRANSITIONS */
@@ -975,15 +1191,29 @@ header button:hover svg {
   transform: translateY(-4px);
 }
 
-/* Dark Mode Enhancements */
-.dark-mode #notificationsDropdown,
-.dark-mode #settingsDropdown {
-  background-color: #1f1f1f;
-  border-color: #3a3a3a;
+/* Smooth transitions for theme switch */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
 }
 
-.dark-mode .comment-item {
-  border-color: #3a3a3a;
+/* Theme toggle button animation */
+#darkModeBtn {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+#darkModeBtn:active {
+  transform: scale(0.95);
+}
+
+#darkModeBtn svg {
+  transition: transform 0.5s ease;
+}
+
+body.dark-mode #darkModeBtn svg {
+  transform: rotate(180deg);
 }
 
 /* Compact View */
@@ -1131,24 +1361,20 @@ main {
   color: #030303 !important;
 }
 
-/* Dark mode search suggestions */
-.dark-mode #searchSuggestions {
-  background: #1f1f1f;
-  border-color: #3a3a3a;
+/* Theme toggle button animation */
+#darkModeBtn {
+  position: relative;
+  transition: transform 0.3s ease;
 }
 
-.dark-mode #searchSuggestions button {
-  color: #e0e0e0;
+#darkModeBtn:active {
+  transform: scale(0.95);
 }
 
-.dark-mode #searchSuggestions button:hover {
-  background: #2a2a2a;
+#darkModeBtn svg {
+  transition: transform 0.5s ease;
 }
 
-.dark-mode .suggestion-item {
-  color: #e0e0e0 !important;
-}
-
-.dark-mode .suggestion-item span {
-  color: #e0e0e0 !important;
+body.dark-mode #darkModeBtn svg {
+  transform: rotate(180deg);
 }

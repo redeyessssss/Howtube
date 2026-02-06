@@ -13,6 +13,12 @@ import {
   update
 } from './firebase-config.js';
 
+// Apply saved theme on page load
+const savedTheme = localStorage.getItem('theme') || 'light';
+if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+}
+
 // State Management
 let currentUser = null;
 let isLoggedIn = false;
