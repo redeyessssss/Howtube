@@ -48,7 +48,12 @@ createPlayerModal();
 // Kick off initial search and setup category listeners
 window.onload = () => {
     // Initialize recommendation engine
-    recommendationEngine = new RecommendationEngine();
+    try {
+        recommendationEngine = new RecommendationEngine();
+        console.log('Recommendation engine initialized');
+    } catch (error) {
+        console.error('Error initializing recommendation engine:', error);
+    }
     
     // Load continue watching
     loadContinueWatching();
@@ -370,6 +375,11 @@ function searchVideos(reset = false) {
         nextPageToken = "";
         container.innerHTML = "";
         hasMoreResults = true;
+        
+        // Track search query
+        if (currentQuery && currentQuery !== 'how to') {
+            trackSearchQuery(currentQuery);
+        }
     }
 
     // section handling
@@ -1213,6 +1223,13 @@ function goHome() {
 
 // Load personalized content
 function loadPersonalizedContent() {
+    if (!recommendationEngine) {
+        console.warn('Recommendation engine not initialized, loading default content');
+        currentQuery = 'how to';
+        searchVideos(true);
+        return;
+    }
+    
     const query = recommendationEngine.getRecommendationQuery();
     currentQuery = query;
     searchVideos(true);
@@ -1220,15 +1237,28 @@ function loadPersonalizedContent() {
     // Show recommended section if user has history
     const stats = recommendationEngine.getUserStats();
     if (stats.totalWatched > 0) {
-        document.getElementById('recommendedSection').classList.remove('hidden');
+        const recommendedSection = document.getElementById('recommendedSection');
+        if (recommendedSection) {
+            recommendedSection.classList.remove('hidden');
+        }
     }
 }
 
 // Load continue watching section
 function loadContinueWatching() {
+    if (!recommendationEngine) {
+        console.warn('Recommendation engine not initialized');
+        return;
+    }
+    
     const continueWatching = recommendationEngine.getContinueWatching();
     const section = document.getElementById('continueWatchingSection');
     const container = document.getElementById('continueWatchingContainer');
+    
+    if (!section || !container) {
+        console.warn('Continue watching elements not found');
+        return;
+    }
     
     if (continueWatching.length === 0) {
         section.classList.add('hidden');
@@ -1244,13 +1274,16 @@ function loadContinueWatching() {
     });
     
     // Setup clear all button
-    document.getElementById('clearContinueWatching').addEventListener('click', () => {
-        if (confirm('Clear all continue watching videos?')) {
-            recommendationEngine.continueWatching = [];
-            localStorage.setItem('continueWatching', '[]');
-            section.classList.add('hidden');
-        }
-    });
+    const clearBtn = document.getElementById('clearContinueWatching');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            if (confirm('Clear all continue watching videos?')) {
+                recommendationEngine.continueWatching = [];
+                localStorage.setItem('continueWatching', '[]');
+                section.classList.add('hidden');
+            }
+        });
+    }
 }
 
 // Create continue watching card
@@ -1328,6 +1361,11 @@ function formatDuration(seconds) {
 
 // Track video watch time
 function startWatchTracking(video) {
+    if (!recommendationEngine) {
+        console.warn('Recommendation engine not available for tracking');
+        return;
+    }
+    
     videoWatchStartTime = Date.now();
     currentPlayingVideo = video;
     
@@ -1338,12 +1376,16 @@ function startWatchTracking(video) {
     
     // Update watch time every 5 seconds
     videoWatchInterval = setInterval(() => {
-        if (ytPlayer && ytPlayer.getPlayerState() === 1) { // Playing
-            const currentTime = ytPlayer.getCurrentTime();
-            const duration = ytPlayer.getDuration();
-            
-            if (currentTime && duration) {
-                recommendationEngine.trackVideoWatch(video, currentTime, duration);
+        if (ytPlayer && ytPlayer.getPlayerState && ytPlayer.getPlayerState() === 1) { // Playing
+            try {
+                const currentTime = ytPlayer.getCurrentTime();
+                const duration = ytPlayer.getDuration();
+                
+                if (currentTime && duration && recommendationEngine) {
+                    recommendationEngine.trackVideoWatch(video, currentTime, duration);
+                }
+            } catch (error) {
+                console.error('Error tracking video watch:', error);
             }
         }
     }, 5000);
@@ -1357,12 +1399,16 @@ function stopWatchTracking() {
     }
     
     // Final update
-    if (ytPlayer && currentPlayingVideo) {
-        const currentTime = ytPlayer.getCurrentTime();
-        const duration = ytPlayer.getDuration();
-        
-        if (currentTime && duration) {
-            recommendationEngine.trackVideoWatch(currentPlayingVideo, currentTime, duration);
+    if (ytPlayer && currentPlayingVideo && recommendationEngine) {
+        try {
+            const currentTime = ytPlayer.getCurrentTime();
+            const duration = ytPlayer.getDuration();
+            
+            if (currentTime && duration) {
+                recommendationEngine.trackVideoWatch(currentPlayingVideo, currentTime, duration);
+            }
+        } catch (error) {
+            console.error('Error in final watch tracking:', error);
         }
     }
     
@@ -1370,17 +1416,17 @@ function stopWatchTracking() {
     loadContinueWatching();
 }
 
-// Override search to track queries
-const originalSearchVideos = searchVideos;
-function searchVideos(reset = false) {
-    if (reset && currentQuery && currentQuery !== 'how to') {
-        recommendationEngine.trackSearch(currentQuery);
+// Track search queries (don't override the function)
+function trackSearchQuery(query) {
+    if (query && query !== 'how to' && recommendationEngine) {
+        recommendationEngine.trackSearch(query);
     }
-    return originalSearchVideos(reset);
 }
 
 // Sort videos by recommendation score
 function applySortByRecommendation(videos) {
+    if (!recommendationEngine) return videos;
+    
     const stats = recommendationEngine.getUserStats();
     
     // Only apply personalized sorting if user has history
