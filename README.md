@@ -1,8 +1,31 @@
 # 🎬 HowTube - Complete YouTube Clone
 
-A fully-featured YouTube clone built with vanilla JavaScript, HTML, and CSS. Features 100+ functionalities including video playback, comments, playlists, analytics, and much more!
+A fully-featured YouTube clone built with vanilla JavaScript, HTML, and CSS. Features 100+ functionalities including video playback, comments, playlists, analytics, Firebase authentication, and much more!
 
 ![HowTube](how.jpg)
+
+## 🔥 Firebase Integration
+
+HowTube now includes complete Firebase integration for authentication and data management!
+
+### Authentication Features
+- ✅ **Email/Password Sign Up & Sign In**
+- ✅ **Google Authentication**
+- ✅ **Facebook Authentication**
+- ✅ **User Profile Management**
+- ✅ **Realtime Database Integration**
+- ✅ **Secure Authentication Flow**
+- ✅ **Password Reset (Coming Soon)**
+
+### Firebase Services Used
+- **Firebase Authentication** - Secure user authentication
+- **Firebase Realtime Database** - User data, watch history, playlists
+- **Firebase Analytics** - User behavior tracking
+
+### New Pages
+- **`signup.html`** - Beautiful signup page with social auth
+- **`profile.html`** - User profile with login/logout
+- **`firebase-config.js`** - Firebase configuration and exports
 
 ## ✨ Features
 
@@ -132,16 +155,32 @@ http://localhost:8000/how.html
 
 ```
 howtube/
-├── how.html              # Main HTML file
+├── index.html            # Main entry point
+├── how.html              # Main application page
 ├── how.css               # Styling and animations
 ├── how.js                # Core functionality
 ├── how-features.js       # Advanced features
 ├── how-advanced.js       # Premium features
+├── profile.html          # User profile/login page
+├── profile.css           # Profile page styling
+├── profile.js            # Profile functionality
+├── signup.html           # User signup page
+├── signup.js             # Signup functionality
+├── firebase-config.js    # Firebase configuration
 ├── how.jpg               # Logo/thumbnail
-└── README.md            # This file
+├── vercel.json           # Vercel deployment config
+└── README.md             # This file
 ```
 
 ## 🎮 Usage
+
+### Getting Started
+1. **Sign Up**: Go to `signup.html` to create a new account
+   - Use email/password
+   - Or sign up with Google/Facebook
+2. **Sign In**: Go to `profile.html` to log in
+3. **Browse Videos**: Explore and watch videos on the main page
+4. **Track Progress**: All your activity is saved to Firebase
 
 ### Basic Navigation
 1. Click any video to play
@@ -149,6 +188,7 @@ howtube/
 3. Try voice search by clicking the microphone icon
 4. Open notifications to see updates
 5. Check settings to customize your experience
+6. Click profile button to access your account
 
 ### Advanced Features
 - **Analytics**: Click "Analytics" in sidebar to view your stats
@@ -156,15 +196,19 @@ howtube/
 - **Shorts**: Click "Shorts" for vertical video experience
 - **Comments**: Click comments button in player to view/post comments
 - **Mini Player**: Click mini player button to watch while browsing
+- **Profile**: Manage your account, view stats, and settings
 
 ## 🛠️ Technologies Used
 
 - **HTML5** - Structure and semantic markup
 - **CSS3** - Styling, animations, and responsive design
 - **Vanilla JavaScript** - All functionality (no frameworks!)
+- **Firebase Authentication** - User authentication
+- **Firebase Realtime Database** - Data storage
+- **Firebase Analytics** - Usage tracking
 - **YouTube Data API v3** - Video data and search
 - **YouTube IFrame API** - Video player integration
-- **LocalStorage API** - Data persistence
+- **LocalStorage API** - Client-side caching
 - **Web Speech API** - Voice search
 - **Share API** - Native sharing
 
@@ -180,20 +224,37 @@ howtube/
 ## 📊 Statistics
 
 - **100+ Features** implemented
-- **5 JavaScript files** with modular code
+- **13 Files** with modular code
 - **1000+ lines** of CSS
-- **2000+ lines** of JavaScript
+- **3000+ lines** of JavaScript
 - **Full YouTube API** integration
+- **Complete Firebase Integration**
+- **3 Authentication Methods** (Email, Google, Facebook)
 - **Zero dependencies** - Pure vanilla JS!
 
-## 🔒 API Key
+## 🔒 API Keys & Configuration
 
+### YouTube API Key
 The project uses a YouTube Data API key. For production use:
 1. Get your own API key from [Google Cloud Console](https://console.cloud.google.com/)
 2. Replace the API key in `how.js`:
 ```javascript
 const API_KEY = "YOUR_API_KEY_HERE";
 ```
+
+### Firebase Configuration
+The project is already configured with Firebase. The configuration is in `firebase-config.js`.
+
+**Firebase Services:**
+- Authentication (Email, Google, Facebook)
+- Realtime Database
+- Analytics
+
+**Note:** The Firebase configuration is already set up and working. For your own project:
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. Enable Authentication methods (Email/Password, Google, Facebook)
+3. Enable Realtime Database
+4. Replace the config in `firebase-config.js`
 
 ## 🤝 Contributing
 

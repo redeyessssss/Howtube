@@ -1,4 +1,17 @@
-// Profile Page JavaScript
+// Profile Page JavaScript with Firebase Authentication
+import {
+  auth,
+  database,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  googleProvider,
+  facebookProvider,
+  signInWithPopup,
+  ref,
+  get,
+  update
+} from './firebase-config.js';
 
 // State Management
 let currentUser = null;
@@ -6,19 +19,57 @@ let isLoggedIn = false;
 
 // Check if user is logged in on page load
 window.addEventListener('DOMContentLoaded', () => {
-    checkLoginStatus();
+    // Listen for auth state changes
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // User is signed in
+            await loadUserFromFirebase(user);
+            isLoggedIn = true;
+            showLoggedInView();
+        } else {
+            // User is signed out
+            isLoggedIn = false;
+            showNotLoggedInView();
+        }
+    });
+    
     setupEventListeners();
 });
 
-// Check login status
-function checkLoginStatus() {
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-        currentUser = JSON.parse(user);
-        isLoggedIn = true;
-        showLoggedInView();
-    } else {
-        showNotLoggedInView();
+// Load user data from Firebase
+async function loadUserFromFirebase(user) {
+    try {
+        const userRef = ref(database, 'users/' + user.uid);
+        const snapshot = await get(userRef);
+        
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            currentUser = {
+                id: user.uid,
+                name: userData.name || user.displayName || 'User',
+                email: userData.email || user.email,
+                avatar: userData.avatar || user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&size=200`,
+                joinedDate: userData.joinedDate,
+                isPremium: userData.isPremium || false,
+                isVerified: userData.isVerified || false
+            };
+        } else {
+            // If no data in database, use auth data
+            currentUser = {
+                id: user.uid,
+                name: user.displayName || 'User',
+                email: user.email,
+                avatar: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&size=200`,
+                joinedDate: new Date().toISOString(),
+                isPremium: false,
+                isVerified: false
+            };
+        }
+        
+        // Save to localStorage for quick access
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    } catch (error) {
+        console.error('Error loading user data:', error);
     }
 }
 
@@ -39,10 +90,16 @@ function showLoggedInView() {
 // Setup Event Listeners
 function setupEventListeners() {
     // Login Form
-    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
     
     // Logout Button
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
     
     // Back Button
     document.getElementById('backBtn').addEventListener('click', () => {
@@ -50,12 +107,29 @@ function setupEventListeners() {
     });
     
     // Toggle Password Visibility
-    document.getElementById('togglePassword').addEventListener('click', togglePasswordVisibility);
+    const togglePassword = document.getElementById('togglePassword');
+    if (togglePassword) {
+        togglePassword.addEventListener('click', togglePasswordVisibility);
+    }
     
-    // Show Signup (placeholder)
-    document.getElementById('showSignupBtn').addEventListener('click', () => {
-        showMessage('Signup feature coming soon!', 'info');
-    });
+    // Show Signup
+    const showSignupBtn = document.getElementById('showSignupBtn');
+    if (showSignupBtn) {
+        showSignupBtn.addEventListener('click', () => {
+            window.location.href = 'signup.html';
+        });
+    }
+    
+    // Social Login Buttons
+    const googleLoginBtn = document.querySelector('.social-btn:nth-child(1)');
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', handleGoogleLogin);
+    }
+    
+    const facebookLoginBtn = document.querySelector('.social-btn:nth-child(2)');
+    if (facebookLoginBtn) {
+        facebookLoginBtn.addEventListener('click', handleFacebookLogin);
+    }
     
     // Tab Switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -63,7 +137,7 @@ function setupEventListeners() {
     });
 }
 
-// Handle Login
+// Handle Login with Firebase
 async function handleLogin(e) {
     e.preventDefault();
     
@@ -73,23 +147,13 @@ async function handleLogin(e) {
     // Show loading
     showLoading();
     
-    // Simulate API call (replace with actual database call later)
-    setTimeout(() => {
-        // For now, accept any email/password
-        const user = {
-            id: Date.now(),
-            name: email.split('@')[0],
-            email: email,
-            avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}&size=200&background=dc2626&color=fff`,
-            joinedDate: new Date().toISOString(),
-            isPremium: true,
-            isVerified: true
-        };
+    try {
+        // Sign in with Firebase
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
         
-        // Save to localStorage
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        currentUser = user;
-        isLoggedIn = true;
+        // Load user data
+        await loadUserFromFirebase(user);
         
         hideLoading();
         showMessage('Login successful! Welcome back!', 'success');
@@ -97,15 +161,99 @@ async function handleLogin(e) {
         setTimeout(() => {
             showLoggedInView();
         }, 1000);
-    }, 1500);
+        
+    } catch (error) {
+        hideLoading();
+        console.error('Login error:', error);
+        
+        // Handle specific error codes
+        let errorMsg = 'Login failed. Please try again.';
+        switch (error.code) {
+            case 'auth/user-not-found':
+                errorMsg = 'No account found with this email.';
+                break;
+            case 'auth/wrong-password':
+                errorMsg = 'Incorrect password.';
+                break;
+            case 'auth/invalid-email':
+                errorMsg = 'Invalid email address.';
+                break;
+            case 'auth/user-disabled':
+                errorMsg = 'This account has been disabled.';
+                break;
+            case 'auth/network-request-failed':
+                errorMsg = 'Network error. Please check your connection.';
+                break;
+        }
+        showMessage(errorMsg, 'error');
+    }
 }
 
-// Handle Logout
+// Handle Google Login
+async function handleGoogleLogin() {
+    showLoading();
+    
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        
+        await loadUserFromFirebase(user);
+        
+        hideLoading();
+        showMessage('Signed in with Google successfully!', 'success');
+        
+        setTimeout(() => {
+            showLoggedInView();
+        }, 1000);
+        
+    } catch (error) {
+        hideLoading();
+        console.error('Google login error:', error);
+        
+        if (error.code === 'auth/popup-closed-by-user') {
+            showMessage('Sign in cancelled', 'error');
+        } else {
+            showMessage('Failed to sign in with Google', 'error');
+        }
+    }
+}
+
+// Handle Facebook Login
+async function handleFacebookLogin() {
+    showLoading();
+    
+    try {
+        const result = await signInWithPopup(auth, facebookProvider);
+        const user = result.user;
+        
+        await loadUserFromFirebase(user);
+        
+        hideLoading();
+        showMessage('Signed in with Facebook successfully!', 'success');
+        
+        setTimeout(() => {
+            showLoggedInView();
+        }, 1000);
+        
+    } catch (error) {
+        hideLoading();
+        console.error('Facebook login error:', error);
+        
+        if (error.code === 'auth/popup-closed-by-user') {
+            showMessage('Sign in cancelled', 'error');
+        } else {
+            showMessage('Failed to sign in with Facebook', 'error');
+        }
+    }
+}
+
+// Handle Logout with Firebase
 function handleLogout() {
     if (confirm('Are you sure you want to logout?')) {
         showLoading();
         
-        setTimeout(() => {
+        signOut(auth).then(() => {
+            // Clear localStorage
             localStorage.removeItem('currentUser');
             currentUser = null;
             isLoggedIn = false;
@@ -116,7 +264,11 @@ function handleLogout() {
             setTimeout(() => {
                 showNotLoggedInView();
             }, 1000);
-        }, 1000);
+        }).catch((error) => {
+            hideLoading();
+            console.error('Logout error:', error);
+            showMessage('Failed to logout. Please try again.', 'error');
+        });
     }
 }
 
